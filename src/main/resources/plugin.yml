@@ -1,0 +1,6 @@
+name: YourPlugin
+version: @version@
+main: com.github.zflxw.papertemplate.YourPlugin
+api-version: 1.17
+authors: [ YourName ]
+description: Your plugin description

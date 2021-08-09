@@ -1,0 +1,48 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.github.zflxw'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = '16'
+targetCompatibility = '16'
+
+jar {
+    configurations.implementation.setCanBeResolved(true)
+
+    from {
+        configurations.implementation.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    duplicatesStrategy(DuplicatesStrategy.INCLUDE)
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+
+    maven { url 'https://oss.sonatype.org/content/groups/public/' }
+    maven { url 'https://libraries.minecraft.net' }
+}
+
+dependencies {
+    // All local jar files in "./libs" folder
+    compileOnly fileTree(dir: 'libs', include: '*.jar')
+    compileOnly 'com.mojang:brigadier:1.0.18'
+
+    implementation 'net.oneandone.reflections8:reflections8:0.11.7'
+}
+
+processResources {
+    from (sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+    duplicatesStrategy(DuplicatesStrategy.INCLUDE)
+}
+
+compileJava.options.encoding = 'UTF-8'
