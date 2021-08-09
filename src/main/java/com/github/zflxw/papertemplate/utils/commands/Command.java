@@ -75,12 +75,12 @@ public abstract class Command {
     }
 
     /**
-     * @return the command node
+     * @return the command name
      */
     public String getCommandName() { return this.commandName; }
 
     /**
-     * @return the command's permission
+     * @return the command permission
      */
     public Permission getPermission() { return this.permission; }
 
@@ -90,7 +90,7 @@ public abstract class Command {
     public CommandType getCommandType() { return this.commandType; }
 
     /**
-     * @return the command's aliases
+     * @return the command aliases
      */
     public List<String> getAliases() { return this.aliases; }
 
