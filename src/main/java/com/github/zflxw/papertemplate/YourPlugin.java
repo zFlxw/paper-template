@@ -1,9 +1,11 @@
 package com.github.zflxw.papertemplate;
 
+import com.github.zflxw.papertemplate.utils.FileUtils;
 import com.github.zflxw.papertemplate.utils.PermissionManager;
 import com.github.zflxw.papertemplate.utils.commands.Command;
 import com.github.zflxw.papertemplate.utils.commands.LoadCommand;
 import com.github.zflxw.papertemplate.utils.listener.LoadListener;
+import com.github.zflxw.papertemplate.utils.localization.Translator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +23,8 @@ public final class YourPlugin extends JavaPlugin {
 
     private static YourPlugin instance;
     private PermissionManager permissionManager;
+    private Translator translator;
+    private FileUtils fileUtils;
 
     @Override
     public void onEnable() {
@@ -33,6 +37,8 @@ public final class YourPlugin extends JavaPlugin {
             exception.printStackTrace();
         }
 
+        this.translator = new Translator(this.getDataFolder());
+        this.fileUtils = new FileUtils();
         this.permissionManager = new PermissionManager();
     }
 
@@ -44,6 +50,8 @@ public final class YourPlugin extends JavaPlugin {
     public static YourPlugin getInstance() { return instance; }
 
     public PermissionManager getPermissionManager() { return this.permissionManager; }
+    public Translator getTranslator() { return this.translator; }
+    public FileUtils getFileUtils() { return this.fileUtils; }
 
     /**
      * registers all classes annotated with "LoadCommand"
