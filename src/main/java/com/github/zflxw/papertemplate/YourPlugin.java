@@ -1,7 +1,11 @@
 package com.github.zflxw.papertemplate;
 
+import com.github.zflxw.papertemplate.utils.PermissionManager;
 import com.github.zflxw.papertemplate.utils.commands.Command;
 import com.github.zflxw.papertemplate.utils.commands.LoadCommand;
+import com.github.zflxw.papertemplate.utils.listener.LoadListener;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections8.Reflections;
 
@@ -16,6 +20,7 @@ public final class YourPlugin extends JavaPlugin {
     public static final String NAMESPACE = "yournamespace";
 
     private static YourPlugin instance;
+    private PermissionManager permissionManager;
 
     @Override
     public void onEnable() {
@@ -23,9 +28,12 @@ public final class YourPlugin extends JavaPlugin {
 
         try {
             this.registerCommands();
+            this.registerListener();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
+        this.permissionManager = new PermissionManager();
     }
 
     @Override
@@ -34,6 +42,8 @@ public final class YourPlugin extends JavaPlugin {
     }
 
     public static YourPlugin getInstance() { return instance; }
+
+    public PermissionManager getPermissionManager() { return this.permissionManager; }
 
     /**
      * registers all classes annotated with "LoadCommand"
@@ -52,6 +62,22 @@ public final class YourPlugin extends JavaPlugin {
 
                 command.register();
             }
+        }
+    }
+
+    /**
+     * registers all classes annotated with "LoadListener"
+     */
+    private void registerListener() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Reflections reflections = new Reflections("com.github.zflxw.papertemplate.listener");
+        for (Class<?> clazz : reflections.getTypesAnnotatedWith(LoadListener.class)) {
+            Object instance = clazz.getDeclaredConstructor().newInstance();
+
+            if (!(instance instanceof Listener)) {
+                continue;
+            }
+
+            Bukkit.getPluginManager().registerEvents((Listener) instance, this);
         }
     }
 }

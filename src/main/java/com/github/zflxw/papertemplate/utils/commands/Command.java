@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class Command {
-    private final ArrayList<CommandNode<CommandListenerWrapper>> commands = new ArrayList<>();
+    public static final List<CommandNode<CommandListenerWrapper>> commands = new ArrayList<>();
     private final String commandName;
     private final Permission permission;
     private final CommandType commandType;
@@ -59,14 +59,17 @@ public abstract class Command {
                         case BOTH -> {
                             return requirement.getBukkitSender().hasPermission(permission);
                         }
+
+                        default -> {
+                            return false;
+                        }
                     }
-                    return false;
                 });
 
         LiteralCommandNode<CommandListenerWrapper> commandNode = createCommand(commandBuilder);
 
         commandDispatcher.getRoot().addChild(commandNode);
-        this.commands.add(commandNode);
+        commands.add(commandNode);
 
         for (String alias : aliases) {
             commandDispatcher.getRoot().addChild(createNode(alias, commandNode));
