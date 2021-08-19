@@ -1,5 +1,7 @@
 package com.github.zflxw.papertemplate;
 
+import com.github.zflxw.papertemplate.config.Config;
+import com.github.zflxw.papertemplate.database.Database;
 import com.github.zflxw.papertemplate.utils.FileUtils;
 import com.github.zflxw.papertemplate.utils.PermissionManager;
 import com.github.zflxw.papertemplate.utils.commands.Command;
@@ -7,12 +9,15 @@ import com.github.zflxw.papertemplate.utils.commands.LoadCommand;
 import com.github.zflxw.papertemplate.utils.listener.LoadListener;
 import com.github.zflxw.papertemplate.utils.localization.Translator;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections8.Reflections;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 public final class YourPlugin extends JavaPlugin {
     /**
@@ -25,10 +30,17 @@ public final class YourPlugin extends JavaPlugin {
     private PermissionManager permissionManager;
     private Translator translator;
     private FileUtils fileUtils;
+    private Database database;
+    private Config config;
 
     @Override
     public void onEnable() {
         instance = this;
+
+        this.translator = new Translator(this.getDataFolder());
+        this.fileUtils = new FileUtils();
+        this.config = new Config(new File(this.getDataFolder(), "config.yml"));
+        this.permissionManager = new PermissionManager();
 
         try {
             this.registerCommands();
@@ -37,14 +49,17 @@ public final class YourPlugin extends JavaPlugin {
             exception.printStackTrace();
         }
 
-        this.translator = new Translator(this.getDataFolder());
-        this.fileUtils = new FileUtils();
-        this.permissionManager = new PermissionManager();
+        this.database = new Database();
+        this.database.connect();
     }
 
     @Override
     public void onDisable() {
+        this.database.disconnect();
+    }
 
+    public void log(Level level, String message) {
+        this.getLogger().log(level, ChatColor.translateAlternateColorCodes('&', message));
     }
 
     public static YourPlugin getInstance() { return instance; }
@@ -52,6 +67,8 @@ public final class YourPlugin extends JavaPlugin {
     public PermissionManager getPermissionManager() { return this.permissionManager; }
     public Translator getTranslator() { return this.translator; }
     public FileUtils getFileUtils() { return this.fileUtils; }
+    public Database getDatabase() { return this.database; }
+    public Config getConfiguration() { return this.config; }
 
     /**
      * registers all classes annotated with "LoadCommand"
